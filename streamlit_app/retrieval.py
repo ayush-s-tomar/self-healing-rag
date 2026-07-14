@@ -16,12 +16,9 @@ from pypdf import PdfReader
 
 CHROMA_DIR = os.getenv("CHROMA_DIR", "./chroma_store")
 COLLECTION_NAME = os.getenv("COLLECTION_NAME", "self_healing_rag")
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 _client = chromadb.PersistentClient(path=CHROMA_DIR)
-_embedder = embedding_functions.SentenceTransformerEmbeddingFunction(
-    model_name=EMBEDDING_MODEL
-)
+_embedder = embedding_functions.DefaultEmbeddingFunction()
 
 _collection = _client.get_or_create_collection(
     name=COLLECTION_NAME,
