@@ -203,10 +203,14 @@ if st.button("Ask", type="primary") and query:
             st.caption("Sources: " + ", ".join(sources))
 
         with st.expander("🔍 Self-healing trace (see the critic at work)", expanded=True):
+            retry_seen = 0
             for i, step in enumerate(trace, start=1):
                 step_name = step.get("step", "unknown")
                 is_retry = "retry" in step_name.lower() or "reformulat" in step_name.lower()
-                badge = f'<span class="shr-badge">Retry {retry_count}</span>' if is_retry and retry_count else ""
+                badge = ""
+                if is_retry:
+                    retry_seen += 1
+                    badge = f'<span class="shr-badge">Retry {retry_seen}</span>'
                 st.markdown(f"**{i}. {step_name}**{badge}", unsafe_allow_html=True)
                 st.json(step, expanded=False)
 
