@@ -25,6 +25,17 @@ Most RAG pipelines retrieve documents, stuff them into a prompt, and generate an
 
 **Self-Healing RAG** adds a closed loop: a **critic** model checks whether the generated answer is actually grounded in the retrieved documents. If it isn't, the pipeline **reformulates the query and retries** — up to a configurable retry limit — before falling back gracefully. You can watch this entire decision process happen live in the **"Self-healing trace"** panel of the app.
 
+## 📸 Screenshots
+
+<p align="center">
+  <img src="assets/screenshot1.png" width="45%" alt="Self-Healing RAG main interface" />
+  <img src="assets/screenshot2.png" width="45%" alt="Self-healing trace in action" />
+</p>
+
+## 🎥 Demo Video
+
+https://github.com/user-attachments/assets/319518fa-f2e6-46d3-86dc-1e361a084126
+
 ## ✨ Features
 
 - 🔄 **Cyclical self-correction loop** — built as a `StateGraph` in [LangGraph](https://www.langchain.com/langgraph), not a linear chain
@@ -87,6 +98,7 @@ self-healing-rag/
 │   ├── nodes.py            # Node functions: generate, critique, fallback, routing
 │   ├── retrieval.py        # Chroma-backed retrieval logic
 │   └── requirements.txt
+├── assets/                 # Screenshots and media used in this README
 ├── .github/workflows/ci.yml
 ├── LICENSE
 └── README.md
