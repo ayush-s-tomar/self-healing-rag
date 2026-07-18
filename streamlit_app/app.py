@@ -35,14 +35,21 @@ st.markdown(
         flex-shrink: 0;
     }
 
-    /* Primary buttons: brand indigo instead of default red */
-    button[kind="primary"] {
+    /* Primary buttons: brand indigo instead of default red.
+       Different Streamlit versions expose this differently, so target all of them. */
+    button[kind="primary"],
+    button[data-testid="baseButton-primary"],
+    .stButton > button[kind="primary"] {
         background-color: var(--accent) !important;
         border-color: var(--accent) !important;
+        color: white !important;
     }
-    button[kind="primary"]:hover {
+    button[kind="primary"]:hover,
+    button[data-testid="baseButton-primary"]:hover,
+    .stButton > button[kind="primary"]:hover {
         background-color: var(--accent-dark) !important;
         border-color: var(--accent-dark) !important;
+        color: white !important;
     }
 
     /* Idle-state placeholder card */
