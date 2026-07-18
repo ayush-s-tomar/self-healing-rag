@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from retrieval import ingest_pdf, collection_is_empty, reset_collection
-from graph import run_query
+from retrieval import ingest_pdf, collection_is_empty, reset_collection  # noqa: E402
+from graph import run_query  # noqa: E402
 
 st.set_page_config(page_title="Self-Healing RAG", page_icon="🔁", layout="centered")
 
