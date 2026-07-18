@@ -11,7 +11,98 @@ from graph import run_query
 
 st.set_page_config(page_title="Self-Healing RAG", page_icon="🔁", layout="centered")
 
-st.title("🔁 Self-Healing RAG")
+# ---------- Cosmetic: brand accent + button color + placeholder/footer styling ----------
+st.markdown(
+    """
+    <style>
+    :root {
+        --accent: #6C5CE7;
+        --accent-dark: #4A3F9E;
+    }
+
+    /* Title row with a small color chip for a "product" feel */
+    .shr-title-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0.1rem;
+    }
+    .shr-chip {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        flex-shrink: 0;
+    }
+
+    /* Primary buttons: brand indigo instead of default red */
+    button[kind="primary"] {
+        background-color: var(--accent) !important;
+        border-color: var(--accent) !important;
+    }
+    button[kind="primary"]:hover {
+        background-color: var(--accent-dark) !important;
+        border-color: var(--accent-dark) !important;
+    }
+
+    /* Idle-state placeholder card */
+    .shr-placeholder {
+        border: 1px dashed rgba(150, 140, 255, 0.35);
+        border-radius: 10px;
+        padding: 1.1rem 1.3rem;
+        background: rgba(108, 92, 231, 0.06);
+        margin-top: 0.6rem;
+        margin-bottom: 1rem;
+    }
+    .shr-placeholder p {
+        margin: 0;
+        font-size: 0.92rem;
+        opacity: 0.85;
+    }
+
+    /* Example question chips */
+    .shr-chip-label {
+        font-size: 0.8rem;
+        opacity: 0.65;
+        margin-bottom: 0.3rem;
+    }
+
+    /* Retry badges in trace */
+    .shr-badge {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 2px 9px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: white;
+        margin-left: 8px;
+        vertical-align: middle;
+    }
+
+    /* Footer */
+    .shr-footer {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        font-size: 0.8rem;
+        opacity: 0.55;
+        text-align: center;
+    }
+    .shr-footer a {
+        color: inherit;
+        text-decoration: underline;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    '<div class="shr-title-row"><span class="shr-chip"></span>'
+    '<h1 style="margin:0;">Self-Healing RAG</h1></div>',
+    unsafe_allow_html=True,
+)
 st.caption(
     "A RAG pipeline that critiques its own answers. If a response isn't "
     "grounded in the retrieved documents, it re-retrieves with a "
@@ -52,7 +143,32 @@ with st.sidebar:
     )
 
 # ---------- Main: query interface ----------
-query = st.text_input("Ask a question about your uploaded document(s)")
+has_docs = not collection_is_empty()
+
+# Default text input value, filled in by example chips below
+if "shr_query" not in st.session_state:
+    st.session_state.shr_query = ""
+
+if not has_docs:
+    st.markdown(
+        '<div class="shr-placeholder"><p>👋 Upload a PDF in the sidebar, then ask a question — '
+        'try something like <em>"What\'s covered under the warranty?"</em> to see a grounded answer, '
+        'or ask about something the doc doesn\'t mention to watch the self-healing retry kick in.</p></div>',
+        unsafe_allow_html=True,
+    )
+else:
+    st.markdown('<div class="shr-chip-label">Try one of these, or type your own below</div>', unsafe_allow_html=True)
+    ex_cols = st.columns(3)
+    example_questions = [
+        "What does this document cover?",
+        "Summarize the key numbers in this doc",
+        "Is there anything about pricing or costs?",
+    ]
+    for col, ex in zip(ex_cols, example_questions):
+        if col.button(ex, use_container_width=True):
+            st.session_state.shr_query = ex
+
+query = st.text_input("Ask a question about your uploaded document(s)", key="shr_query")
 
 if st.button("Ask", type="primary") and query:
     if collection_is_empty():
@@ -79,8 +195,17 @@ if st.button("Ask", type="primary") and query:
         if sources:
             st.caption("Sources: " + ", ".join(sources))
 
-        with st.expander("🔍 Self-healing trace (see the critic at work)"):
+        with st.expander("🔍 Self-healing trace (see the critic at work)", expanded=True):
             for i, step in enumerate(trace, start=1):
                 step_name = step.get("step", "unknown")
-                st.markdown(f"**{i}. {step_name}**")
+                is_retry = "retry" in step_name.lower() or "reformulat" in step_name.lower()
+                badge = f'<span class="shr-badge">Retry {retry_count}</span>' if is_retry and retry_count else ""
+                st.markdown(f"**{i}. {step_name}**{badge}", unsafe_allow_html=True)
                 st.json(step, expanded=False)
+
+# ---------- Footer ----------
+st.markdown(
+    '<div class="shr-footer">Built with LangGraph + Groq + Chroma · '
+    '<a href="https://github.com/ayush-s-tomar/self-healing-rag" target="_blank">View on GitHub</a></div>',
+    unsafe_allow_html=True,
+)
