@@ -55,6 +55,12 @@ def generate_node(state: RAGState) -> RAGState:
         f"[Source: {c['source']}]\n{c['text']}" for c in chunks
     ) or "No relevant context was found."
 
+    # Use the active query (which may have been reformulated on a retry) so the
+    # answer is generated against the same question that drove retrieval —
+    # otherwise a retry fetches new chunks but re-answers the stale original
+    # phrasing, defeating the point of reformulating in the first place.
+    active_query = state.get("active_query") or state["query"]
+
     prompt = f"""Answer the question using ONLY the context below. If the context
 does not contain enough information to answer confidently, say so explicitly —
 do not guess or fill gaps with outside knowledge.
@@ -62,7 +68,7 @@ do not guess or fill gaps with outside knowledge.
 Context:
 {context}
 
-Question: {state['query']}
+Question: {active_query}
 
 Answer:"""
 
