@@ -32,9 +32,13 @@ Most RAG pipelines retrieve documents, stuff them into a prompt, and generate an
   <img src="assets/screenshot2.png" width="45%" alt="Self-healing trace in action" />
 </p>
 
-## 🎥 Demo Video
+## 🎥 Demo
 
-https://github.com/user-attachments/assets/319518fa-f2e6-46d3-86dc-1e361a084126
+<p align="center">
+  <img src="assets/self_healing_rag_demo.gif" alt="Self-Healing RAG demo GIF" width="800" />
+</p>
+
+**Full walkthrough video:** https://github.com/user-attachments/assets/64c62ba5-f80b-48aa-86fc-e30ab216332d
 
 ## ✨ Features
 
