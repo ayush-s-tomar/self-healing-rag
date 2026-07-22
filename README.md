@@ -38,7 +38,9 @@ Most RAG pipelines retrieve documents, stuff them into a prompt, and generate an
   <img src="assets/self_healing_rag_demo.gif" alt="Self-Healing RAG demo GIF" width="800" />
 </p>
 
-**Full walkthrough video:** https://github.com/user-attachments/assets/64c62ba5-f80b-48aa-86fc-e30ab216332d
+**Full walkthrough video:**
+
+https://github.com/user-attachments/assets/64c62ba5-f80b-48aa-86fc-e30ab216332d
 
 ## ✨ Features
 
