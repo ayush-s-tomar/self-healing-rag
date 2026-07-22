@@ -56,10 +56,10 @@ https://github.com/user-attachments/assets/64c62ba5-f80b-48aa-86fc-e30ab216332d
 ```mermaid
 flowchart TD
     A[User Query] --> B[Retrieve from Chroma]
-    B --> C[Generate Answer<br/>LLaMA 3.3 70B]
-    C --> D{Critic:<br/>Is it grounded?<br/>LLaMA 3.1 8B}
+    B --> C["Generate Answer (LLaMA 3.3 70B)"]
+    C --> D{"Critic: Is it grounded? (LLaMA 3.1 8B)"}
     D -- Grounded --> E[✅ Accept Answer]
-    D -- Not grounded<br/>and retries left --> F[Reformulate Query]
+    D -- "Not grounded, retries left" --> F["Reformulate Query"]
     F --> B
     D -- Retries exhausted --> G[⚠️ Fallback Answer]
 ```
