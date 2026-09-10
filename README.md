@@ -31,10 +31,18 @@ Most RAG pipelines retrieve documents, stuff them into a prompt, and generate an
 - 🔍 **The reasoning is visible, not a black box** — the self-healing trace panel shows every retrieval, critique, and retry step live, not just the final answer.
 - 🏗️ **Built as a real cyclical graph**, not a linear chain — implemented as a LangGraph `StateGraph` with an explicit `retrieve → generate → critique → route` loop.
 
+---
+
+## 📚 Contents
+
+[Demo](#-demo) · [Features](#-features) · [Architecture](#️-architecture) · [Getting Started](#-getting-started) · [Project Structure](#-project-structure) · [Tech Stack](#️-tech-stack) · [Deployment](#️-deployment) · [Roadmap](#️-roadmap) · [Contributing](#-contributing) · [License](#-license)
+
+---
+
 ## 🎥 Demo
 
 <p align="center">
-  <img src="assets/self_healing_rag_demo.gif" alt="Self-Healing RAG demo GIF" width="800" />
+  <img src="assets/self_healing_rag_demo.gif" alt="Self-Healing RAG demo — query triggering a retrieve, critique, and retry loop" width="800" />
 </p>
 
 <details>
@@ -42,8 +50,8 @@ Most RAG pipelines retrieve documents, stuff them into a prompt, and generate an
 <br/>
 
 <p align="center">
-  <img src="assets/screenshot1.png" width="45%" alt="Self-Healing RAG main interface" />
-  <img src="assets/screenshot2.png" width="45%" alt="Self-healing trace in action" />
+  <img src="assets/screenshot1.png" width="45%" alt="Self-Healing RAG main interface with PDF upload and query box" />
+  <img src="assets/screenshot2.png" width="45%" alt="Self-healing trace panel showing a retry after a failed groundedness check" />
 </p>
 
 <br/>
@@ -51,6 +59,8 @@ Most RAG pipelines retrieve documents, stuff them into a prompt, and generate an
 https://github.com/user-attachments/assets/64c62ba5-f80b-48aa-86fc-e30ab216332d
 
 </details>
+
+---
 
 ## ✨ Features
 
@@ -60,6 +70,8 @@ https://github.com/user-attachments/assets/64c62ba5-f80b-48aa-86fc-e30ab216332d
 - 🔍 **Transparent reasoning** — expand the self-healing trace to see every retrieval, critique, and retry step in real time
 - 🛡️ **Graceful fallback** — after the retry budget is exhausted, the app returns an honest fallback answer instead of guessing
 - 🗄️ **Vector storage** via [Chroma](https://www.trychroma.com/)
+
+---
 
 ## 🏗️ Architecture
 
@@ -75,6 +87,10 @@ flowchart TD
 ```
 
 The loop is implemented as a cyclical LangGraph `StateGraph`: `retrieve → generate → critique → route`, where `route_after_critique` decides whether to `accept`, `retry`, or `fallback` based on the critic's groundedness verdict and the current retry count.
+
+**Design trade-off:** the critic runs on a smaller, faster model (LLaMA 3.1 8B) than the generator (LLaMA 3.3 70B) on purpose — groundedness checking is a simpler judgment call than generation, so the safety loop adds a retry path without doubling end-to-end latency on the common, already-grounded case.
+
+---
 
 ## 🚀 Getting Started
 
@@ -104,6 +120,8 @@ The app will be available at `http://localhost:8501`.
 
 > **Note (hosted demo only, not local runs):** on free/constrained CPU hosting, PDF ingestion and the first query may take 20–30 seconds while models warm up. This doesn't apply when running locally on your own machine.
 
+---
+
 ## 🧰 Project Structure
 
 ```
@@ -120,6 +138,8 @@ self-healing-rag/
 └── README.md
 ```
 
+---
+
 ## 🛠️ Tech Stack
 
 | Layer | Tool |
@@ -129,6 +149,35 @@ self-healing-rag/
 | Vector store | [Chroma](https://www.trychroma.com/) |
 | UI | [Streamlit](https://streamlit.io/) |
 | Deployment | Hugging Face Spaces (Docker) |
+
+---
+
+## ☁️ Deployment
+
+The live demo runs on **Hugging Face Spaces**, using the Docker SDK:
+
+1. Create a new Space at [huggingface.co/new-space](https://huggingface.co/new-space) → SDK: **Docker**
+2. Push this repo to the Space's git remote (Spaces build directly from a `Dockerfile` at the repo root, or from `streamlit_app/` if you point the Space config at that subdirectory)
+3. Add `GROQ_API_KEY` under **Settings → Repository secrets**
+4. The Space builds and serves the Streamlit app automatically on push
+
+Because the app has no external database — Chroma runs in-process and PDFs are ingested per-session — there's no separate data layer to provision.
+
+---
+
+## 🗺️ Roadmap
+
+- [x] Cyclical retrieve → generate → critique → retry loop (LangGraph `StateGraph`)
+- [x] Two-model split (fast critic, larger generator)
+- [x] Live self-healing trace panel
+- [x] PDF ingestion via sidebar upload
+- [x] Graceful fallback after retry budget exhausted
+- [ ] Quantify the loop's own value — measure groundedness-failure rate and retry success rate on a small labeled query set, the way [ResumeIQ](https://github.com/ayush-s-tomar/ResumeIQ) evaluates its ATS scorer
+- [ ] Multi-document / multi-PDF sessions
+- [ ] Configurable retry limit exposed in the UI (currently set in code)
+- [ ] Persistent vector store option for repeat queries across sessions
+
+---
 
 ## 🤝 Contributing
 
