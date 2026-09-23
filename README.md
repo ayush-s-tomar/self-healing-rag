@@ -35,7 +35,7 @@ Most RAG pipelines retrieve documents, stuff them into a prompt, and generate an
 
 ## 📚 Contents
 
-[Demo](#-demo) · [Features](#-features) · [Architecture](#️-architecture) · [Getting Started](#-getting-started) · [Project Structure](#-project-structure) · [Tech Stack](#️-tech-stack) · [Deployment](#️-deployment) · [Roadmap](#️-roadmap) · [Contributing](#-contributing) · [License](#-license)
+[Demo](#-demo) · [Features](#-features) · [Architecture](#️-architecture) · [Getting Started](#-getting-started) · [Project Structure](#-project-structure) · [Tech Stack](#️-tech-stack) · [Deployment](#️-deployment) · [Known Limitations](#️-known-limitations) · [Roadmap](#️-roadmap) · [Contributing](#-contributing) · [License](#-license)
 
 ---
 
@@ -165,6 +165,15 @@ Because the app has no external database — Chroma runs in-process and PDFs are
 
 ---
 
+## ⚠️ Known Limitations
+
+- **The loop's own effectiveness isn't quantified yet** — the retry mechanism is real and functional, but there's no eval measuring how often the critic actually catches an ungrounded answer, or how often a retry fixes it. This is the top Roadmap item below, not a hidden gap.
+- **No cross-session persistence** — Chroma runs in-process and PDFs are ingested per session, so re-opening the app means re-uploading your document; nothing is saved between visits.
+- **Retry limit is hardcoded, not user-configurable** — it's set in code rather than exposed in the UI, so you can't currently tune how aggressively the loop retries without editing `graph.py`.
+- **Free-tier cold start** — on Hugging Face Spaces' free CPU tier, PDF ingestion and the first query can take 20–30 seconds while models warm up (see [Getting Started](#-getting-started)).
+
+---
+
 ## 🗺️ Roadmap
 
 - [x] Cyclical retrieve → generate → critique → retry loop (LangGraph `StateGraph`)
@@ -196,7 +205,7 @@ Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information
 ## 🙋 Author
 
 **Ayush Singh Tomar**
-[GitHub](https://github.com/ayush-s-tomar) · [LinkedIn](https://www.linkedin.com/in/ayushsinghtomar)
+[GitHub](https://github.com/ayush-s-tomar) · [LinkedIn](https://www.linkedin.com/in/ayushsinghtomar) · [Portfolio](https://ayush-s-tomar.vercel.app)
 
 ---
 
